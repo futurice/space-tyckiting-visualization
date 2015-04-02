@@ -7,6 +7,8 @@ namespace SpaceTyckiting
 	{
 		[SerializeField]
 		private Material material;
+		[SerializeField]
+		private GameObject targetObjectPrefab;
 
 		private Mesh mesh;
 		private GameObject meshObject;
@@ -21,9 +23,10 @@ namespace SpaceTyckiting
 		{
 			material = Instantiate(material) as Material;
 
-			targetObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+			targetObject = Instantiate (targetObjectPrefab) as GameObject;
+
 			targetObject.GetComponent<Renderer>().material = material;
-			targetObject.GetComponent<Transform>().localScale = Vector3.one * Settings.radarArea * Settings.cellSize;
+			targetObject.GetComponent<Transform>().localScale = Vector3.one * (1 + 2 * Settings.radarArea) * Settings.cellWidth*5;
 			targetObject.SetActive(false);
 			targetObject.GetComponent<Transform>().parent = GameManager.Instance.GameParent;
 
@@ -31,7 +34,7 @@ namespace SpaceTyckiting
 			if (col != null) Destroy(col);
 
 			tr = GetComponent<Transform>();
-			meshObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+			meshObject = Instantiate (targetObjectPrefab) as GameObject;
 
 			var col2 = meshObject.GetComponent<Collider>();
 			if (col2 != null) Destroy(col2);
@@ -51,7 +54,7 @@ namespace SpaceTyckiting
 		{
 			SetVertices(tr.position, Settings.GetWorldCoordinate(x, y));
 
-			targetObject.GetComponent<Transform>().position = Settings.GetWorldCoordinate(x, y) + Vector3.up * Settings.cellSize * Settings.radarArea * 0.5f;
+			targetObject.GetComponent<Transform>().position = Settings.GetWorldCoordinate(x, y) + Vector3.up * Settings.cellSize * Settings.radarArea;
 
 			meshObject.SetActive(true);
 			targetObject.SetActive(true);
@@ -62,43 +65,27 @@ namespace SpaceTyckiting
 		void SetVertices(Vector3 startPosition, Vector3 targetPosition)
 		{
 			var vertices = mesh.vertices;
-			float targetSize = Settings.cellSize * 0.5f * Settings.radarArea;
-			float startSize = 0.5f;
-			vertices[0] = targetPosition + new Vector3(targetSize, 0, targetSize);
-			vertices[1] = targetPosition + new Vector3(-targetSize, 0, targetSize);
+			float targetHeight = (1 + 2 * Settings.radarArea) * 0.75f * 0.5f * Settings.cellHeight;
+			float targetWidth = (1 + 2 * Settings.radarArea) * 0.5f * Settings.cellWidth;
+			float targetHalfWidth = targetWidth * 0.5f;
 
-			vertices[2] = startPosition + new Vector3(startSize, 0, startSize);
-			vertices[3] = startPosition + new Vector3(-startSize, 0, startSize);
-			vertices[4] = startPosition + new Vector3(startSize, 0, -startSize);
-			vertices[5] = startPosition + new Vector3(-startSize, 0, -startSize);
+			vertices[0] = targetPosition + new Vector3(-targetHalfWidth, 0, -targetHeight);
+			vertices[1] = targetPosition + new Vector3(targetHalfWidth, 0, -targetHeight);
 
-			vertices[6] = targetPosition + new Vector3(targetSize, 0, -targetSize);
-			vertices[7] = targetPosition + new Vector3(-targetSize, 0, -targetSize);
+			vertices[2] = startPosition + new Vector3(0, 0, 0);
+			vertices[3] = startPosition + new Vector3(0, 0, 0);
 
-			vertices[8] = startPosition + new Vector3(startSize, 0, startSize);
-			vertices[9] = startPosition + new Vector3(-startSize, 0, startSize);
-			vertices[10] = startPosition + new Vector3(startSize, 0, -startSize);
-			vertices[11] = startPosition + new Vector3(-startSize, 0, -startSize);
+			vertices[4] = targetPosition + new Vector3(-targetWidth, 0, 0);
+			vertices[5] = startPosition + new Vector3(0, 0, 0);
 
-			vertices[12] = targetPosition + new Vector3(targetSize, 0, -targetSize);
-			vertices[13] = targetPosition + new Vector3(-targetSize, 0, targetSize);
-			vertices[14] = targetPosition + new Vector3(-targetSize, 0, -targetSize);
-			vertices[15] = targetPosition + new Vector3(targetSize, 0, targetSize);
-			vertices[16] = targetPosition + new Vector3(-targetSize, 0, targetSize);
+			vertices[6] = targetPosition + new Vector3(-targetHalfWidth, 0, targetHeight);
+			vertices[7] = startPosition + new Vector3(0, 0, 0);
 
-			vertices[17] = startPosition + new Vector3(-startSize, 0, -startSize);
+			vertices[8] = targetPosition + new Vector3(targetHalfWidth, 0, targetHeight);
+			vertices[9] = startPosition + new Vector3(0, 0, 0);
 
-			vertices[18] = targetPosition + new Vector3(-targetSize, 0, -targetSize);
-
-			vertices[19] = startPosition + new Vector3(-startSize, 0, startSize);
-
-			vertices[20] = targetPosition + new Vector3(targetSize, 0, -targetSize);
-
-			vertices[21] = startPosition + new Vector3(startSize, 0, startSize);
-
-			vertices[22] = targetPosition + new Vector3(targetSize, 0, targetSize);
-
-			vertices[23] = startPosition + new Vector3(startSize, 0, -startSize);
+			vertices[10] = targetPosition + new Vector3(targetWidth, 0, 0);
+			vertices[11] = startPosition + new Vector3(0, 0, 0);
 
 			mesh.vertices = vertices;
 		}

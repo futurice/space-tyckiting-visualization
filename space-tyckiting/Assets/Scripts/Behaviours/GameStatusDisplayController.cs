@@ -118,7 +118,7 @@ namespace SpaceTyckiting
 		{
 			if (GameManager.Instance.CurrentPhase != GameManager.GamePhase.None)
 			{
-				turnNumberDisplay.text = "Turn " + (GameManager.Instance.CurrentTurn + 1);
+				turnNumberDisplay.text = "Turn " + (GameManager.Instance.CurrentTurn);
 				UpdateScoreDisplays();
 			}
 		}

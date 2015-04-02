@@ -25,3 +25,10 @@ open space-tyckiting.app --args path=test1.json timescale=2
 Press "Start" to start or restart game
 
 Keys 1-3 change camera setup, Escape to quit
+
+Arrows move the camera, shift speeds up movement.
+
+
+## Attirubtions
+
+Game plane hexagonal mesh by Fredrik Holmström from https://github.com/fholm/unityassets
