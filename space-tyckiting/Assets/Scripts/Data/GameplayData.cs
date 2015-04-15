@@ -10,14 +10,16 @@ namespace SpaceTyckiting
 		public readonly string teamNameOne;
 		public readonly string teamNameTwo;
 		public readonly BotData[] bots;
+		public readonly AsteroidData[] asteroids;
 		public readonly GameTurndata[] turns;
 
-		public GameplayData(string teamNameOne, string teamNameTwo, BotData[] bots, GameTurndata[] turns)
+		public GameplayData(string teamNameOne, string teamNameTwo, BotData[] bots, GameTurndata[] turns, AsteroidData[] asteroids)
 		{
 			this.teamNameOne = teamNameOne;
 			this.teamNameTwo = teamNameTwo;
 			this.bots = bots;
 			this.turns = turns;
+			this.asteroids = asteroids;
 		}
 
 		public static GameplayData FromJson(string json)
@@ -28,6 +30,7 @@ namespace SpaceTyckiting
 			string teamNameTwo = "";
 			var bots = new List<BotData>();
 			var turns = new List<GameTurndata>();
+			var asteroids = new List<AsteroidData> ();
 
 			foreach (var message in data.Children) {
 				switch (message["type"]) {
@@ -51,8 +54,16 @@ namespace SpaceTyckiting
 					foreach (var botData in teamDataTwo["bots"].Children) {
 						bots.Add(new BotData(botData["botId"].AsInt, botData["name"], teamIdTwo, botData["pos"]["x"].AsInt, botData["pos"]["y"].AsInt));
 					}
+
 					break;
 				case "round":
+					// Read asteroids when first available
+					if (asteroids.Count <= 0) {
+						foreach (var asteroidData in message["asteroids"].Children) {
+							asteroids.Add(new AsteroidData(asteroidData["x"].AsInt, asteroidData["y"].AsInt));
+						}
+					}
+
 					// Read actions and events
 					var radars = new List<PlayerAction>();
 					var moves = new List<PlayerAction>();
@@ -96,6 +107,7 @@ namespace SpaceTyckiting
 						case "hit":
 						case "noaction":
 						case "detected":
+						case "seeAsteroid":
 							break;
 						default:
 							Debug.Log ("Unkown event type " + eventData["event"]);
@@ -115,7 +127,7 @@ namespace SpaceTyckiting
 				}
 			}
 
-			return new GameplayData(teamNameOne, teamNameTwo, bots.ToArray(), turns.ToArray());
+			return new GameplayData(teamNameOne, teamNameTwo, bots.ToArray(), turns.ToArray(), asteroids.ToArray());
 		}
 	}
 }

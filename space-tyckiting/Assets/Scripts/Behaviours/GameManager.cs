@@ -30,6 +30,8 @@ namespace SpaceTyckiting
 		[SerializeField]
 		private NameLabelController unitLabelPrefab2;
 		[SerializeField]
+		private GameObject asteroidPrefab;
+		[SerializeField]
 		private Canvas gameWorldUICanvasTop;
 		[SerializeField]
 		private Transform gameParent;
@@ -81,6 +83,7 @@ namespace SpaceTyckiting
 		public void Play()
 		{
 			Clean();
+			SpawnAsteroids();
 			SpawnUnits();
 			StartCoroutine(Play_Coroutine(GameData));
 		}
@@ -93,6 +96,18 @@ namespace SpaceTyckiting
 				Destroy(gameParent.GetChild(i).gameObject);
 			}
 			CurrentPhase = GamePhase.None;
+		}
+
+		void SpawnAsteroids()
+		{
+			if (GameData.asteroids == null) return;
+
+			foreach (var asteroidData in GameData.asteroids)
+			{
+				var position = Settings.GetWorldCoordinate(asteroidData.x, asteroidData.y);
+				var go = Instantiate(asteroidPrefab, position, Random.rotation) as GameObject;
+				go.transform.parent = gameParent;
+			}
 		}
 
 		void SpawnUnits()
