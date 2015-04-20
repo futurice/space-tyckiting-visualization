@@ -116,60 +116,6 @@ namespace SpaceTyckiting
 			}
 			IsLoading = false;
 		}
-	
-		BotData[] CreateRandomBots()
-		{
-			var bots = new BotData[6];
-			for (int i = 0; i < bots.Length; i++)
-			{
-				var x = Random.Range(0, Settings.gridSize);
-				var y = Random.Range(0, Settings.gridSize);
-
-				bots[i] = new BotData(i, "Random-" + Random.Range(0, 100000), i % 2, x, y);
-			}
-
-			return bots;
-		}
-
-		GameTurndata[] CreateRandomGame(int turns)
-		{
-			var gameData = new GameTurndata[turns];
-			for (int i = 0; i < turns; i++)
-			{
-				gameData[i] = RandomTurn();
-			}
-
-			return gameData;
-		}
-
-		GameTurndata RandomTurn()
-		{
-			var radars = new List<PlayerAction>();
-			var moves = new List<PlayerAction>();
-			var cannons = new List<PlayerAction>();
-
-			for (int j = 0; j < 6; j++)
-			{
-				float choice = Random.value;
-
-				if (choice < 0.45f)
-				{
-					cannons.Add(new PlayerAction(j, Random.Range(0, Settings.gridSize), Random.Range(0, Settings.gridSize)));
-				}
-				else if (choice < 0.7f)
-				{
-					radars.Add(new PlayerAction(j, Random.Range(0, Settings.gridSize), Random.Range(0, Settings.gridSize)));
-				}
-				else
-				{
-					int moveX = Random.value < 0.5f ? -1 : 1;
-					int moveY = Random.value < 0.5f ? -1 : 1;
-
-					moves.Add(new PlayerAction(j, moveX, moveY));
-				}
-			}
-
-			return new GameTurndata(radars.ToArray(), moves.ToArray(), cannons.ToArray());
-		}
+ 	
 	}
 }

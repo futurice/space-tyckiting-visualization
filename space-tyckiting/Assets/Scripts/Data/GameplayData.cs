@@ -24,50 +24,97 @@ namespace SpaceTyckiting
 		{
 			var data = JSON.Parse(json);
 
-			var teamsData = data["teams"];
-
-			var teamData1 = teamsData[0];
-			string teamNameOne = teamData1["team"];
-			int teamIdOne = teamData1["id"].AsInt;
-			var botsData1 = teamData1["bots"];
+			string teamNameOne = "";
+			string teamNameTwo = "";
 			var bots = new List<BotData>();
-			foreach (var botData in botsData1.Children)
-			{
-				bots.Add(new BotData(botData["id"].AsInt, botData["name"],  teamIdOne, botData["x"].AsInt, botData["y"].AsInt));
-			}
-
-			var teamData2 = teamsData[1];
-			string teamNameTwo = teamData2["team"];
-			int teamIdTwo = teamData2["id"].AsInt;
-			var botsData2 = teamData2["bots"];
-			
-			foreach (var botData in botsData2.Children)
-			{
-				bots.Add(new BotData(botData["id"].AsInt, botData["name"], teamIdTwo, botData["x"].AsInt, botData["y"].AsInt));
-			}
-			
-			var turnsData = data["turns"];
 			var turns = new List<GameTurndata>();
 
-			foreach (var turnData in turnsData.Children)
-			{
-				var radars = new List<PlayerAction>();
-				foreach (var radarsData in turnData["radars"].Children)
-				{
-					radars.Add(new PlayerAction(radarsData["botId"].AsInt, radarsData["x"].AsInt, radarsData["y"].AsInt));
+			foreach (var message in data.Children) {
+				switch (message["type"]) {
+				case "connected":
+					// TODO: Read config
+					break;
+				case "start":
+					var teamsData = message["teams"];
+					// Read team 1
+					var teamDataOne = teamsData[0];
+					teamNameOne = teamDataOne["name"];
+					int teamIdOne = 0;  // Need to be zero indexed
+					foreach (var botData in teamDataOne["bots"].Children) {
+						bots.Add(new BotData(botData["botId"].AsInt, botData["name"], teamIdOne, botData["pos"]["x"].AsInt, botData["pos"]["y"].AsInt));
+					}
+
+					// Read team 2
+					var teamDataTwo = teamsData[1];
+					teamNameTwo = teamDataTwo["name"];
+					int teamIdTwo = 1;  // Need to be zero indexed
+					foreach (var botData in teamDataTwo["bots"].Children) {
+						bots.Add(new BotData(botData["botId"].AsInt, botData["name"], teamIdTwo, botData["pos"]["x"].AsInt, botData["pos"]["y"].AsInt));
+					}
+					break;
+				case "round":
+					// Read actions and events
+					var radars = new List<PlayerAction>();
+					var moves = new List<PlayerAction>();
+					var cannons = new List<PlayerAction>();
+					var sees = new List<PlayerAction>();
+					var radarEchos = new List<PlayerAction>();
+					var damages = new List<PlayerAction>();
+					var deaths = new List<PlayerAction>();
+					foreach (var actionData in message["actions"].Children) {
+						switch (actionData["type"]) {
+						case "radar":
+							radars.Add(new PlayerAction(actionData["botId"].AsInt, actionData["pos"]["x"].AsInt, actionData["pos"]["y"].AsInt));
+							break;
+						case "move":
+							break;
+						case "cannon":
+							cannons.Add(new PlayerAction(actionData["botId"].AsInt, actionData["pos"]["x"].AsInt, actionData["pos"]["y"].AsInt));
+							break;
+						default:
+							Debug.Log ("Unkown action type " + actionData["type"]);
+							break;
+						}
+					}
+					foreach (var eventData in message["events"].Children) {
+						switch (eventData["event"]) {
+						case "see":
+							sees.Add(new PlayerAction(eventData["botId"].AsInt, eventData["pos"]["x"].AsInt, eventData["pos"]["y"].AsInt));
+							break;
+						case "move":
+							moves.Add(new PlayerAction(eventData["botId"].AsInt, eventData["pos"]["x"].AsInt, eventData["pos"]["y"].AsInt));
+							break;
+						case "damaged":
+							damages.Add(new PlayerAction(eventData["botId"].AsInt, eventData["damage"].AsInt));
+							break;
+						case "die":
+							deaths.Add(new PlayerAction(eventData["botId"].AsInt));
+							break;
+						case "radarEcho":
+							radarEchos.Add(new PlayerAction(eventData["botId"].AsInt, eventData["pos"]["x"].AsInt, eventData["pos"]["y"].AsInt));
+							break;
+						case "hit":
+						case "noaction":
+						case "detected":
+							break;
+						default:
+							Debug.Log ("Unkown event type " + eventData["event"]);
+							break;
+						}
+					}
+
+					turns.Add(new GameTurndata(radars.ToArray(), moves.ToArray(), cannons.ToArray(),
+					                           sees.ToArray(), radarEchos.ToArray(), damages.ToArray(), deaths.ToArray()));
+					break;
+				case "endSummary":
+					// TODO: Add end event
+					break;
+				default:
+					Debug.Log ("Unkown message type " + message["type"]);
+					break;
 				}
-				var moves = new List<PlayerAction>();
-				foreach (var movesData in turnData["moves"].Children)
-				{
-					moves.Add(new PlayerAction(movesData["botId"].AsInt, movesData["x"].AsInt, movesData["y"].AsInt));
-				}
-				var cannons = new List<PlayerAction>();
-				foreach (var cannonsData in turnData["cannons"].Children)
-				{
-					cannons.Add(new PlayerAction(cannonsData["botId"].AsInt, cannonsData["x"].AsInt, cannonsData["y"].AsInt));
-				}
-				turns.Add(new GameTurndata(radars.ToArray(), moves.ToArray(), cannons.ToArray()));
 			}
+
 			return new GameplayData(teamNameOne, teamNameTwo, bots.ToArray(), turns.ToArray());
 		}
 	}

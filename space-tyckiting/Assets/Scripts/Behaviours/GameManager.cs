@@ -144,29 +144,6 @@ namespace SpaceTyckiting
 			label.Init(unit);
 		}
 
-		public void HandleExplosion(int x, int y)
-		{
-			for (int i = 0; i < Units.Count; i++)
-			{
-				var distance = SquareDistance(x, y, Units[i].PositionX, Units[i].PositionY);
-				if (distance == 0)
-				{
-					// Direct hit
-					Units[i].TakeDamage(2);
-				}
-				else if (distance == 1)
-				{
-					// Side hit
-					Units[i].TakeDamage(1);
-				}
-			}
-		}
-
-		private int SquareDistance(int x1, int y1, int x2, int y2)
-		{
-			return Mathf.Max(Mathf.Abs(x1 - x2), Mathf.Abs(y1 - y2));
-		}
-
 		public int UnitsInCell(int x, int y)
 		{
 			int count = 0;
@@ -209,59 +186,14 @@ namespace SpaceTyckiting
 				CurrentPhase = GamePhase.Moves;
 				if (turns[CurrentTurn].moves.Length > 0)
 				{
-					for (int i = 0; i < turns[CurrentTurn].moves.Length; i++)
-					{
-						var action = turns[CurrentTurn].moves[i];
-						if (action.wasCancelled) continue;
-
-						var unit = GetUnit(action.actorId);
-
-						if (unit != null)
-						{
-							var finalTargetX = Mathf.Clamp(action.targetX, 0, Settings.gridSize - 1);
-							var finalTargetY = Mathf.Clamp(action.targetY, 0, Settings.gridSize - 1);
-
-							if (finalTargetX > unit.PositionX + Settings.maxMove || finalTargetX < unit.PositionX - Settings.maxMove
-								|| finalTargetY > unit.PositionY + Settings.maxMove || finalTargetY < unit.PositionY - Settings.maxMove
-								|| (finalTargetX == unit.PositionX && finalTargetY == unit.PositionY))
-							{
-								Debug.Log("Illegal move for bot " + unit.ActorId + " from " + unit.PositionX + ", " + unit.PositionY + " to " + finalTargetX + ", " + finalTargetY);
-							}
-							else
-							{
-								unit.MoveTo(finalTargetX, finalTargetY);
-							}
-
-							//finalTargetX = Mathf.Clamp(finalTargetX, unit.PositionX - Settings.maxMove, unit.PositionX + Settings.maxMove);
-							//finalTargetY = Mathf.Clamp(finalTargetY, unit.PositionY - Settings.maxMove, unit.PositionY + Settings.maxMove);
-						}
-					}
+					HandleMoves(turns[CurrentTurn].moves);
 
 					timeUsed += 0.3f;
 					yield return new WaitForSeconds(0.3f);
 				}
 
 				var spottedByRange = new List<UnitController>();
-				for (int i = 0; i < Units.Count; i++)
-				{
-					for (int j = 0; j < Units.Count; j++)
-					{
-						if (Units[i] != null && Units[j] != null && Units[i].FactionId != Units[j].FactionId)
-						{
-							bool inRange = SquareDistance(Units[i].PositionX, Units[i].PositionY, Units[j].PositionX, Units[j].PositionY) <= 2;
-
-							if (inRange && !spotted.Contains(Units[i]) && !spottedByRange.Contains(Units[i]))
-							{
-								spottedByRange.Add(Units[i]);
-							}
-							if (inRange && !spotted.Contains(Units[j]) && !spottedByRange.Contains(Units[j]))
-							{
-								spottedByRange.Add(Units[j]);
-							}
-						}
-					}
-				}
-
+				HandleSpots(turns[CurrentTurn].sees, spottedByRange);
 				spotted.AddRange(spottedByRange);
 				RevealSpotted(spottedByRange, spottedLastTurn);
 
@@ -269,18 +201,8 @@ namespace SpaceTyckiting
 				var spottedByRadar = new List<UnitController>();
 				if (turns[CurrentTurn].radars.Length > 0)
 				{
-					for (int i = 0; i < turns[CurrentTurn].radars.Length; i++)
-					{
-						var action = turns[CurrentTurn].radars[i];
-						if (action.wasCancelled) continue;
-
-						var unit = GetUnit(action.actorId);
-						if (unit != null)
-						{
-							unit.Radar(action.targetX, action.targetY);
-							AddSpottedToList(spottedByRadar, action.targetX, action.targetY, unit.FactionId);
-						}
-					}
+					HandleRadars(turns[CurrentTurn].radars);
+					HandleSpots(turns[CurrentTurn].radarEchos, spottedByRadar);
 
 					timeUsed += 1f;
 					yield return new WaitForSeconds(0.5f);
@@ -294,35 +216,25 @@ namespace SpaceTyckiting
 				CurrentPhase = GamePhase.Cannons;
 				if (turns[CurrentTurn].cannons.Length > 0)
 				{
-					for (int i = 0; i < turns[CurrentTurn].cannons.Length; i++)
-					{
-						var action = turns[CurrentTurn].cannons[i];
-						if (action.wasCancelled) continue;
 
-						var unit = GetUnit(action.actorId);
-						if (unit != null) unit.Shoot(action.targetX, action.targetY, 0.2f);
-					}
+					HandleCannons(turns[CurrentTurn].cannons);
 
 					timeUsed += 1.85f;
 					yield return new WaitForSeconds(1.5f);
 
-					List<int[]> explosions = new List<int[]>();
-					for (int i = 0; i < turns[CurrentTurn].cannons.Length; i++)
-					{
-						var action = turns[CurrentTurn].cannons[i];
-						if (action.wasCancelled) continue;
-
-						var unit = GetUnit(action.actorId);
-						if (unit != null) explosions.Add(new int[] { action.targetX, action.targetY });
-					}
-					for (int i = 0; i < explosions.Count; i++)
-					{
-						HandleExplosion(explosions[i][0], explosions[i][1]);
-					}
+					HandleDamages(turns[CurrentTurn].damages);
+					HandleDeaths(turns[CurrentTurn].deaths);
 
 					timeUsed += 0.35f;
 					yield return new WaitForSeconds(0.35f);
 				}
+				else
+				{
+					// Just in case someone dies without cannonings
+					HandleDamages(turns[CurrentTurn].damages);
+					HandleDeaths(turns[CurrentTurn].deaths);
+				}
+
 
 				float timeToWait = Mathf.Max(Settings.minRoundLength - timeUsed, 0.35f);
 				
@@ -357,17 +269,57 @@ namespace SpaceTyckiting
 			}
 		}
 
-		private void AddSpottedToList(List<UnitController> spottedList, int centerX, int centerY, int spotterFaction)
+		private void HandleMoves(PlayerAction[] moves)
 		{
-			for (int i = 0; i < Units.Count; i++)
+			foreach (var action in moves)
 			{
-				if (Units[i] != null && !spottedList.Contains(Units[i]) && Units[i].FactionId != spotterFaction)
-				{
-					if (SquareDistance(centerX, centerY, Units[i].PositionX, Units[i].PositionY) <= (Settings.radarArea - 1) / 2)
-					{
-						spottedList.Add(Units[i]);
-					}
-				}
+				var unit = GetUnit(action.actorId);
+				if (unit != null) unit.MoveTo(action.targetX, action.targetY);
+			}			
+		}
+
+		private void HandleSpots(PlayerAction[] sees, List<UnitController> spotted)
+		{
+			foreach (var action in sees)
+			{
+				var unit = GetUnit(action.actorId);
+				if (unit != null) spotted.Add(unit);
+			}			
+		}
+
+		private void HandleRadars(PlayerAction[] radars)
+		{
+			foreach (var action in radars)
+			{
+				var unit = GetUnit(action.actorId);
+				if (unit != null) unit.Radar(action.targetX, action.targetY);
+			}			
+		}
+
+		private void HandleCannons(PlayerAction[] cannons)
+		{
+			foreach (var action in cannons)
+			{
+				var unit = GetUnit(action.actorId);
+				if (unit != null) unit.Shoot(action.targetX, action.targetY, 0.2f);
+			}			
+		}
+
+		private void HandleDamages(PlayerAction[] damages)
+		{
+			foreach (var action in damages)
+			{
+				var unit = GetUnit(action.actorId);
+				if (unit != null) unit.TakeDamage(action.amount);
+			}
+		}
+
+		private void HandleDeaths(PlayerAction[] deaths)
+		{
+			foreach (var action in deaths)
+			{
+				var unit = GetUnit(action.actorId);
+				if (unit != null) unit.Die();
 			}
 		}
 
