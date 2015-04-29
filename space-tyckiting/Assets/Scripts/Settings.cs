@@ -5,13 +5,14 @@ namespace SpaceTyckiting
 {
 	public static class Settings
 	{
-		public const int gridSize = 14;
 		public const float cellSize = 10f;	// Width of one hex edge
 		public static readonly float cellHeight = 2f*cellSize;
 		public static readonly float cellWidth = Mathf.Sqrt(3f)/2f * cellHeight;
 		public const float minRoundLength = 3;
-		public const int maxMove = 2;
-		public const int radarArea = 3;
+
+		public static int gridSize = 14;
+		public static int radarArea = 3;
+		public static int startHp = 3;
 
 		public static Vector3 GetWorldCoordinate(int x, int y)
 		{
