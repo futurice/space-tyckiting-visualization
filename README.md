@@ -20,6 +20,10 @@ For example on OSX, run from terminal with
 
 open space-tyckiting.app --args path=test1.json timescale=2
 
+Note that the path needs to without sub directories, or be absolute.
+
+To change resolution and controller settings, start the application with shift (windows) or alt (mac) key pressed down.
+
 ## In-game instructions
 
 Press "Start" to start or restart game

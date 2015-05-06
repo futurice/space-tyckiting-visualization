@@ -121,6 +121,12 @@
       "loopTime": 300
     },
     "actions": [],
+    "asteroids": [
+        {
+            "x": 3,
+            "y": 3
+        }
+    ],
     "teams": [
       {
         "bots": [

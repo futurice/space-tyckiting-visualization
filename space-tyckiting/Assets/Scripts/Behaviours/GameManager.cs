@@ -30,6 +30,8 @@ namespace SpaceTyckiting
 		[SerializeField]
 		private NameLabelController unitLabelPrefab2;
 		[SerializeField]
+		private GameObject asteroidPrefab;
+		[SerializeField]
 		private Canvas gameWorldUICanvasTop;
 		[SerializeField]
 		private Transform gameParent;
@@ -75,12 +77,52 @@ namespace SpaceTyckiting
 		{
 			GameData = data;
 
-			if (GameLoaded != null) GameLoaded();
+			if (GameLoaded != null) {
+				UpdateSettings(data);
+				SetupPlayMat();
+				GameLoaded ();
+			}
 		}
+
+		void UpdateSettings(GameplayData gameData)
+		{
+			Settings.radarArea = GameData.config.radar;
+			Settings.gridSize = GameData.config.fieldRadius;
+			Settings.startHp = GameData.config.startHp;
+		}
+
+		void SetupPlayMat()
+		{
+			int gridSize = GameData.config.fieldRadius;
+			int cellCount = gridSize * 2 + 1;
+
+			// Scale playMat
+			// Most of these values are just result of trial-and-error... sorry
+			float scale = cellCount * Settings.cellSize * Mathf.Sqrt(3f)/2f + 3f;
+			float tilingX = cellCount + 0.36f;
+			float tilingY = tilingX / Mathf.Sqrt(3f);
+			float offsetX = 0.82f;
+			float offsetY = 0.28f + gridSize * 0.4225f;
+
+			var playMat = GameObject.Find ("PlayMat");
+			playMat.renderer.transform.localScale = new Vector3(scale, 0f, scale);
+			playMat.renderer.material.mainTextureScale = new Vector2 (tilingX, tilingY);
+			playMat.renderer.material.mainTextureOffset = new Vector2 (offsetX, offsetY);
+
+			// Scale camera
+			float camSize = 10f + gridSize * 16f;
+			float camOffset = 5f + gridSize * 8f;
+
+			var mainCam = GameObject.Find ("Main Camera");
+			mainCam.transform.position = new Vector3(camOffset, 150f, 0f);
+			mainCam.camera.orthographicSize = camSize;
+		}
+
 
 		public void Play()
 		{
 			Clean();
+			SpawnAsteroids();
 			SpawnUnits();
 			StartCoroutine(Play_Coroutine(GameData));
 		}
@@ -93,6 +135,18 @@ namespace SpaceTyckiting
 				Destroy(gameParent.GetChild(i).gameObject);
 			}
 			CurrentPhase = GamePhase.None;
+		}
+
+		void SpawnAsteroids()
+		{
+			if (GameData.asteroids == null) return;
+
+			foreach (var asteroidData in GameData.asteroids)
+			{
+				var position = Settings.GetWorldCoordinate(asteroidData.x, asteroidData.y);
+				var go = Instantiate(asteroidPrefab, position, Random.rotation) as GameObject;
+				go.transform.parent = gameParent;
+			}
 		}
 
 		void SpawnUnits()

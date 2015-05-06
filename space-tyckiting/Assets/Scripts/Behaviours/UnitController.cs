@@ -10,8 +10,6 @@ namespace SpaceTyckiting
 		[SerializeField]
 		private SearchlightController searchlight;
 		[SerializeField]
-		private int maxHitPoints = 10;
-		[SerializeField]
 		private GameObject destroyEffect;
 		[SerializeField]
 		private GameObject modelRoot;
@@ -33,7 +31,7 @@ namespace SpaceTyckiting
 		public int PositionX { get; private set; }
 		public int PositionY { get; private set; }
 
-		public int HitPoints { get { return maxHitPoints - damage; } }
+		public int HitPoints { get { return Settings.startHp - damage; } }
 
 		public int FactionId { get; set; }
 		public int ActorId { get; set; }
@@ -71,7 +69,7 @@ namespace SpaceTyckiting
 			go.GetComponent<Transform>().parent = GameManager.Instance.GameParent;
 			healthBar = go.GetComponent<HealthBarController>();
 			healthBar.Target = modelRoot.GetComponent<Transform>();
-			healthBar.SetSize(maxHitPoints, maxHitPoints, false);
+			healthBar.SetSize(Settings.startHp, Settings.startHp, false);
 		}
 
 		public void SetPos(int x, int y)
@@ -168,9 +166,9 @@ namespace SpaceTyckiting
 
 			if (isDead) return;
 
-			healthBar.SetSize(maxHitPoints - damage, maxHitPoints, true);
+			healthBar.SetSize(Settings.startHp - damage, Settings.startHp, true);
 
-			if (damage >= maxHitPoints) Die();
+			if (damage >= Settings.startHp) Die();
 		}
 
 		public void Die()
