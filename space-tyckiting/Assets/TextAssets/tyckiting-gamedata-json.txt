@@ -1,6 +1,7 @@
 [
   {
     "config": {
+      "blurs": null,
       "maxCount": 200,
       "fieldRadius": 14,
       "bots": 3,

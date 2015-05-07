@@ -26,6 +26,7 @@ namespace SpaceTyckiting
 
 		public static GameplayData FromJson(string json)
 		{
+			json = json.Replace ("null", "-1");
 			var data = JSON.Parse(json);
 
 			var config = new ConfigData(2, 14, 2, 10, 1, 3, 2, 300, 300);
@@ -37,14 +38,13 @@ namespace SpaceTyckiting
 
 			foreach (var message in data.Children) {
 				switch (message["type"]) {
-				case "connected":
-					// TODO: Read config
+				case "start":
+					// Read config
 					var configData = message["config"];
 					config = new ConfigData(configData["bots"].AsInt, configData["fieldRadius"].AsInt, configData["move"].AsInt, configData["startHp"].AsInt,
 					                        configData["cannon"].AsInt, configData["radar"].AsInt, configData["see"].AsInt, configData["maxCount"].AsInt,
 					                        configData["loopTime"].AsInt);
-					break;
-				case "start":
+
 					var teamsData = message["teams"];
 					// Read team 1
 					var teamDataOne = teamsData[0];
@@ -127,6 +127,8 @@ namespace SpaceTyckiting
 					break;
 				case "endSummary":
 					// TODO: Add end event
+					break;
+				case "connected":
 					break;
 				default:
 					Debug.Log ("Unkown message type " + message["type"]);
