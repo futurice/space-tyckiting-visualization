@@ -188,7 +188,7 @@ namespace SpaceTyckiting
 
 		public void Reveal(bool wasHiddenLastTurn)
 		{
-			if (spotFade != null) spotFade.cancel();
+			if (spotFade != null) LeanTween.cancel(gameObject, spotFade.id);
 
 			spottedIndicator.gameObject.SetActive(true);
 			var color = spottedIndicator.material.GetColor("_TintColor");

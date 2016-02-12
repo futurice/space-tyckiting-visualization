@@ -65,7 +65,7 @@ namespace SpaceTyckiting
 
 			if (animate)
 			{
-				if (sizeAnimation != null) sizeAnimation.cancel();
+				if (sizeAnimation != null) LeanTween.cancel(gameObject, sizeAnimation.id);
 
 				sizeAnimation = LeanTween.scaleX(gameObject, width * maxWidth, 2);
 				sizeAnimation.setEase(LeanTweenType.easeInQuad);
