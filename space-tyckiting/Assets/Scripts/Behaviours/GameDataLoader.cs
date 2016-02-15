@@ -72,6 +72,13 @@ namespace SpaceTyckiting
 			StartCoroutine(LoadGame_Coroutine(url));
 		}
 
+		public void LoadGameJson(string json)
+		{
+			var data = GameplayData.FromJson(json);
+
+			HandleGameLoaded(data);
+		}
+
 		public void SetTimeScale(float timeScale)
 		{
 			Time.timeScale = timeScale;
@@ -115,9 +122,7 @@ namespace SpaceTyckiting
 			{
 				var json = www.text;
 
-				var data = GameplayData.FromJson(json);
-
-				HandleGameLoaded(data);
+				LoadGameJson (json);
 			}
 			IsLoading = false;
 		}
