@@ -6,7 +6,22 @@ https://github.com/futurice/space-tyckiting
 
 Some features require Unity Pro to function.
 
-## How to run
+## How to run (WebGL)
+Embed the build to a webpage, and from the page you can run scripts to call functions in the game.
+http://docs.unity3d.com/Manual/webgl-interactingwithbrowserscripting.html
+
+To load a game data file, call
+SendMessage ('Canvas', 'LoadGame', 'www.url.com/path/to/json');
+or
+SendMessage ('Canvas', 'LoadGameJson', '[{"valid json data"}]');
+
+To set the time scale, call
+SendMessage ('Canvas', 'SetTimeScale', '2');
+Replace last parameter with desired time scale.
+
+You might need to wait for the player to load before the functions can be called.
+
+## How to run (Desktop)
 
 Open built project from command line and supply game data json as an argument "path"
 
