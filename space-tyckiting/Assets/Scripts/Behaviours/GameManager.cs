@@ -115,7 +115,7 @@ namespace SpaceTyckiting
 
 			var mainCam = GameObject.Find ("Main Camera");
 			mainCam.transform.position = new Vector3(camOffset, 150f, 0f);
-			mainCam.camera.orthographicSize = camSize;
+			mainCam.GetComponent<Camera>().orthographicSize = camSize;
 		}
 
 
