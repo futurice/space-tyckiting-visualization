@@ -72,6 +72,11 @@ namespace SpaceTyckiting
 			StartCoroutine(LoadGame_Coroutine(url));
 		}
 
+		public void SetTimeScale(float timeScale)
+		{
+			Time.timeScale = timeScale;
+		}
+
 		void HandleGameLoaded(GameplayData data)
 		{
 			LastLoadedData = data;
