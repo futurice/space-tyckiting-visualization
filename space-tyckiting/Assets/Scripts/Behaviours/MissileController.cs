@@ -36,6 +36,8 @@ namespace SpaceTyckiting
 			move.setOrientToPath(true);
 
 			Invoke("Explode", 1.05f);
+
+			SoundEffectPlayer.Instance.PlayMissile ();
 		}
 
 		void Update()
@@ -52,6 +54,7 @@ namespace SpaceTyckiting
 			Destroy(trail, 2);
 			var go = Instantiate(explosionEffectPrefab, targetWorldPosition, Quaternion.identity) as GameObject;
 			go.GetComponent<Transform>().parent = GameManager.Instance.GameParent;
+			SoundEffectPlayer.Instance.PlayExplosion ();
 			Destroy(gameObject);
 		}
 	}

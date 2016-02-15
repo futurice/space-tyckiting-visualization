@@ -23,6 +23,9 @@ namespace SpaceTyckiting
 		[SerializeField]
 		private Toggle soundsToggle;
 
+		[SerializeField]
+		private AudioSource musicPlayer;
+
 		private bool initialized = false;
 
 		void OnEnable()
@@ -51,6 +54,10 @@ namespace SpaceTyckiting
 			soundsToggle.isOn = PlayerPrefs.GetInt("sounds_on", 1) > 0;
 
 			Application.targetFrameRate = quality >= 2 ? 60 : 30;
+
+			musicPlayer.enabled = musicToggle.isOn;
+
+			SoundEffectPlayer.soundsOn = soundsToggle.isOn;
 		}
 
 		void Start()
@@ -88,6 +95,8 @@ namespace SpaceTyckiting
 				PlayerPrefs.SetInt("sounds_on", soundsToggle.isOn? 1 : 0);
 
 				PlayerPrefs.Save();
+
+				SoundEffectPlayer.soundsOn = soundsToggle.isOn;
 			}
 		}
 
@@ -98,6 +107,8 @@ namespace SpaceTyckiting
 				PlayerPrefs.SetInt("music_on", musicToggle.isOn ? 1 : 0);
 
 				PlayerPrefs.Save();
+
+				musicPlayer.enabled = musicToggle.isOn;
 			}
 		}
 	}

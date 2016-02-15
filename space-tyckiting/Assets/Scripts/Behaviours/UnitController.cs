@@ -148,6 +148,8 @@ namespace SpaceTyckiting
 			if (x == PositionX && y == PositionY)
 			{
 				searchlight.ShowAnimated(x, y);
+
+				SoundEffectPlayer.Instance.PlayRadar ();
 			}
 			else
 			{
@@ -155,7 +157,10 @@ namespace SpaceTyckiting
 				var targetRotation = Quaternion.LookRotation(targetPosition - tr.position).eulerAngles;
 				var rotate = LeanTween.rotate(gameObject, targetRotation, 0.2f);
 				rotate.setEase(LeanTweenType.easeInOutExpo);
-				rotate.setOnComplete(() => { searchlight.ShowAnimated(x, y); });
+				rotate.setOnComplete(() => {
+					searchlight.ShowAnimated(x, y); 
+					SoundEffectPlayer.Instance.PlayRadar ();
+				});
 				rotate.delay = Random.Range(0, 0.2f);
 			}
 		}
@@ -182,6 +187,8 @@ namespace SpaceTyckiting
 			Destroy(spottedIndicator);
 
 			Instantiate(destroyEffect, GridWorldPos, Quaternion.identity);
+
+			SoundEffectPlayer.Instance.PlayExplosionLarge ();
 
 			Destroy(gameObject);
 		}
