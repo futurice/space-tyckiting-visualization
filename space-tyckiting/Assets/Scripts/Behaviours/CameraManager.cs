@@ -10,12 +10,15 @@ namespace SpaceTyckiting
 		[SerializeField]
 		private Camera mainCamera;
 
-		private Rect cinematicRect;
+		private Rect leftViewRect;
+		private Rect rightViewRect;
 
 		void Awake()
 		{
-			cinematicRect = cinematicCamera.rect;
+			leftViewRect = mainCamera.rect;
+			rightViewRect = cinematicCamera.rect;
 		}
+
 		void Update()
 		{
 			if (Input.GetKeyUp(KeyCode.Alpha1)) CameraSetup1();
@@ -27,13 +30,15 @@ namespace SpaceTyckiting
 		{
 			cinematicCamera.enabled = true;
 			mainCamera.enabled = true;
-			cinematicCamera.rect = cinematicRect;
+			cinematicCamera.rect = rightViewRect;
+			mainCamera.rect = leftViewRect;
 		}
 
 		void CameraSetup2()
 		{
 			cinematicCamera.enabled = false;
 			mainCamera.enabled = true;
+			mainCamera.rect = new Rect(0,0,0.85f,1);
 		}
 
 		void CameraSetup3()
