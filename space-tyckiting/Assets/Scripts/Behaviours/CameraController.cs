@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Linq;
 
 namespace SpaceTyckiting
 {
@@ -34,6 +35,9 @@ namespace SpaceTyckiting
 		[SerializeField]
 		private float autoRotateDistance = 400;
 
+		[SerializeField]
+		private float autoRotateDistanceMargin = 30;
+
 		private Vector3 lastMousePosition;
 
 		private float lastTouchTime = 0;
@@ -57,13 +61,50 @@ namespace SpaceTyckiting
 			
 			if (isAutoRotating)
 			{
-				var targetX = Mathf.Sin(Time.time * autoRotateSpeed) * autoRotateDistance;
-				var targetY = Mathf.Cos(Time.time * autoRotateSpeed) * autoRotateDistance;
+				var center = Vector3.zero;
+				var distance = autoRotateDistance;
+
+				int unitCount = 0;
+				if (GameManager.Instance.Units != null) 
+				{
+					unitCount = GameManager.Instance.Units.Count (x => x != null && x.isActiveAndEnabled);
+				}
+
+				if (unitCount > 0) 
+				{
+					Vector3 maxPosition = Vector3.zero;
+					Vector3 minPosition = Vector3.zero;
+
+					for (int i = 0; i < GameManager.Instance.Units.Count; i++) 
+					{
+						if (GameManager.Instance.Units [i] == null || !GameManager.Instance.Units [i].isActiveAndEnabled) 
+						{
+							continue;
+						}
+
+						var position = GameManager.Instance.Units [i].transform.position;
+
+						minPosition.x = Mathf.Min (position.x, minPosition.x);
+						minPosition.z = Mathf.Min (position.z, minPosition.z);
+						maxPosition.x = Mathf.Max (position.x, maxPosition.x);
+						maxPosition.z = Mathf.Max (position.z, maxPosition.z);
+					}
+
+					center = (minPosition + maxPosition) * 0.5f;
+
+					var sizeX = maxPosition.x - minPosition.x;
+					var sizeZ = maxPosition.z - minPosition.z;
+					distance = Mathf.Max(50, Mathf.Max (sizeX, sizeZ) * 0.5f + autoRotateDistanceMargin);
+				}
+
+
+				var targetX = Mathf.Sin(Time.time * autoRotateSpeed) * distance;
+				var targetY = Mathf.Cos(Time.time * autoRotateSpeed) * distance;
 				var targetPosition = new Vector3(targetX, autoRotateHeight, targetY);
 
-				moveTransform.position = Vector3.MoveTowards(moveTransform.position, targetPosition, Time.deltaTime * autoRotateMoveSpeed);
+				moveTransform.position = Vector3.MoveTowards(moveTransform.position, center + targetPosition, Time.deltaTime * autoRotateMoveSpeed);
 
-				var targetRotation = Quaternion.LookRotation(autoRotateLookAtPos - rotationTransform.position, Vector3.up);
+				var targetRotation = Quaternion.LookRotation(autoRotateLookAtPos + center - rotationTransform.position, Vector3.up);
 				var targetRotationEuler = targetRotation.eulerAngles;
 				moveTransform.eulerAngles = Vector3.up * targetRotationEuler.y;
 				rotationTransform.localEulerAngles = Vector3.right * targetRotationEuler.x;
