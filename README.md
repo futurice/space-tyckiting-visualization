@@ -16,7 +16,7 @@ or
 SendMessage ('Canvas', 'LoadGameJson', '[{"valid json data"}]');
 
 To set the time scale, call
-SendMessage ('Canvas', 'SetTimeScale', '2');
+SendMessage ('Canvas', 'SetTimeScale', 2);
 Replace last parameter with desired time scale.
 
 You might need to wait for the player to load before the functions can be called.
