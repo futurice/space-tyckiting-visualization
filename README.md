@@ -10,6 +10,8 @@ Some features require Unity Pro to function.
 Embed the build to a webpage, and from the page you can run scripts to call functions in the game.
 http://docs.unity3d.com/Manual/webgl-interactingwithbrowserscripting.html
 
+When the game has loaded and is ready to receive commands, it will call function "OnUnityReady()" from the embedding web page.
+
 To load a game data file, call
 SendMessage ('Canvas', 'LoadGame', 'www.url.com/path/to/json');
 or
