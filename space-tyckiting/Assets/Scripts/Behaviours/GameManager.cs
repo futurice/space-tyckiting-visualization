@@ -108,16 +108,7 @@ namespace SpaceTyckiting
 			playMat.GetComponent<Renderer>().transform.localScale = new Vector3(scale, 0f, scale);
 			playMat.GetComponent<Renderer>().material.mainTextureScale = new Vector2 (tilingX, tilingY);
 			playMat.GetComponent<Renderer>().material.mainTextureOffset = new Vector2 (offsetX, offsetY);
-
-			// Scale camera
-			float camSize = 10f + gridSize * 16f;
-			float camOffset = 5f + gridSize * 8f;
-
-			var mainCam = GameObject.Find ("Main Camera");
-			mainCam.transform.position = new Vector3(camOffset, 150f, 0f);
-			mainCam.GetComponent<Camera>().orthographicSize = camSize;
 		}
-
 
 		public void Play()
 		{
