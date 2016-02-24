@@ -21,6 +21,22 @@ namespace SpaceTyckiting
 		public static event System.Action GameLoaded;
 		public static event System.Action<GamePhase, GamePhase> GamePhaseChanged;
 
+		private float gameSpeed = 1;
+		public float GameSpeed 
+		{
+			get 
+			{
+				return gameSpeed;
+			}
+			set
+			{
+				gameSpeed = Mathf.Clamp (value, 0.2f, 5f);
+				GameSpeedInverse = 1 / gameSpeed;
+			}
+		}
+
+		public float GameSpeedInverse { get; private set; }
+
 		[SerializeField]
 		private UnitController unitPrefabFaction1;
 		[SerializeField]
@@ -64,6 +80,8 @@ namespace SpaceTyckiting
 		void Awake()
 		{
 			Instance = this;
+
+			GameSpeed = 3;
 		
 			LeanTween.init(200);
 		}
@@ -281,7 +299,7 @@ namespace SpaceTyckiting
 				}
 
 
-				float timeToWait = Mathf.Max(Settings.minRoundLength - timeUsed, 0.35f);
+				float timeToWait = Mathf.Max(Settings.minRoundLength * GameSpeedInverse - timeUsed, 0.35f * GameSpeedInverse);
 				
 				yield return new WaitForSeconds(timeToWait);
 

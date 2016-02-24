@@ -30,12 +30,12 @@ namespace SpaceTyckiting
 			var controlEnd = targetWorldPosition + tr.forward;
 			LTSpline ltSpline = new LTSpline(new Vector3[] { controlStart, tr.position, midPoint, targetWorldPosition, controlEnd });
 
-			var move = LeanTween.moveSpline(gameObject, ltSpline.pts, 1f);
+			var move = LeanTween.moveSpline(gameObject, ltSpline.pts, 1f * GameManager.Instance.GameSpeedInverse);
 			move.setEase(LeanTweenType.easeInCubic);
 			move.setOnComplete(Explode);
 			move.setOrientToPath(true);
 
-			Invoke("Explode", 1.05f);
+			Invoke("Explode", 1.05f * GameManager.Instance.GameSpeedInverse);
 
 			SoundEffectPlayer.Instance.PlayMissile ();
 		}

@@ -90,15 +90,15 @@ namespace SpaceTyckiting
 			var targetPosition = Settings.GetWorldCoordinate(x, y);
 		
 			var targetRotation = Quaternion.LookRotation(targetPosition - tr.position).eulerAngles;
-			var rotate = LeanTween.rotate(gameObject, targetRotation, 0.6f);
+			var rotate = LeanTween.rotate(gameObject, targetRotation, 0.6f * GameManager.Instance.GameSpeedInverse);
 			rotate.setEase(LeanTweenType.easeOutExpo);
 
-			var offset = LeanTween.moveLocalY(modelRoot, GameManager.Instance.UnitsInCell(x, y) * heightOffsetPerUnit, 0.75f);
+			var offset = LeanTween.moveLocalY(modelRoot, GameManager.Instance.UnitsInCell(x, y) * heightOffsetPerUnit, 0.75f * GameManager.Instance.GameSpeedInverse);
 			offset.setEase(LeanTweenType.easeInExpo);
 
-			var move = LeanTween.move(gameObject, targetPosition, 1);
+			var move = LeanTween.move(gameObject, targetPosition, 1 * GameManager.Instance.GameSpeedInverse);
 			move.setEase(LeanTweenType.easeInOutQuad);
-			move.delay = Random.Range(0, 0.2f);
+			move.delay = Random.Range(0, 0.2f * GameManager.Instance.GameSpeedInverse);
 
 			PositionX = x;
 			PositionY = y;
@@ -122,7 +122,7 @@ namespace SpaceTyckiting
 
 		private IEnumerator Shoot_Coroutine(int x, int y, float maxDelay)
 		{
-			yield return new WaitForSeconds(Random.Range(0, maxDelay));
+			yield return new WaitForSeconds(Random.Range(0, maxDelay * GameManager.Instance.GameSpeedInverse));
 
 			ShootImmediate(x, y);
 		}
@@ -133,7 +133,7 @@ namespace SpaceTyckiting
 			{
 				var targetPosition = Settings.GetWorldCoordinate(x, y);
 				var targetRotation = Quaternion.LookRotation(targetPosition - tr.position).eulerAngles;
-				var rotate = LeanTween.rotate(gameObject, targetRotation, 0.3f);
+				var rotate = LeanTween.rotate(gameObject, targetRotation, 0.3f * GameManager.Instance.GameSpeedInverse);
 				rotate.setEase(LeanTweenType.easeOutExpo);
 			}
 
@@ -155,13 +155,13 @@ namespace SpaceTyckiting
 			{
 				var targetPosition = Settings.GetWorldCoordinate(x, y);
 				var targetRotation = Quaternion.LookRotation(targetPosition - tr.position).eulerAngles;
-				var rotate = LeanTween.rotate(gameObject, targetRotation, 0.2f);
+				var rotate = LeanTween.rotate(gameObject, targetRotation, 0.2f * GameManager.Instance.GameSpeedInverse);
 				rotate.setEase(LeanTweenType.easeInOutExpo);
 				rotate.setOnComplete(() => {
 					searchlight.ShowAnimated(x, y); 
 					SoundEffectPlayer.Instance.PlayRadar ();
 				});
-				rotate.delay = Random.Range(0, 0.2f);
+				rotate.delay = Random.Range(0, 0.2f * GameManager.Instance.GameSpeedInverse);
 			}
 		}
 
@@ -206,7 +206,7 @@ namespace SpaceTyckiting
 			pos.x = GridWorldPos.x;
 			pos.z = GridWorldPos.z;
 			spTr.position = pos;
-			spotFade = LeanTween.alpha(spottedIndicator.gameObject, 0, 8);
+			spotFade = LeanTween.alpha(spottedIndicator.gameObject, 0, 8 * GameManager.Instance.GameSpeedInverse);
 
 			if (wasHiddenLastTurn) spottedParticles.Play();
 		}

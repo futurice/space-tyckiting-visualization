@@ -8,6 +8,8 @@ namespace SpaceTyckiting
 		[SerializeField]
 		private Material material;
 		[SerializeField]
+		private Material beamMaterial;
+		[SerializeField]
 		private GameObject targetObjectPrefab;
 
 		private Mesh mesh;
@@ -15,6 +17,7 @@ namespace SpaceTyckiting
 		private Vector3 targetPosition;
 		private Transform tr;
 		private Color onColor;
+		private Color beamOnColor;
 		private GameObject targetObject;
 
 		private bool isOn = false;
@@ -41,13 +44,14 @@ namespace SpaceTyckiting
 
 			meshObject.transform.position = Vector3.zero;
 			mesh = meshObject.GetComponent<MeshFilter>().mesh;
-			meshObject.GetComponent<Renderer>().material = material;
+			meshObject.GetComponent<Renderer>().material = beamMaterial;
 			meshObject.SetActive(false);
 			mesh.MarkDynamic();
 
 			meshObject.GetComponent<Transform>().parent = GameManager.Instance.GameParent;
 
 			onColor = material.GetColor("_TintColor");
+			beamOnColor = beamMaterial.GetColor("_TintColor");
 		}
 
 		public void ShowAnimated(int x, int y)
@@ -95,13 +99,19 @@ namespace SpaceTyckiting
 			isOn = true;
 
 			// LeanTween.value seems to fail at times, just make sure light is turned off
-			Invoke("LightOffCompletion", 1.8f);
+			Invoke("LightOffCompletion", 1.8f * GameManager.Instance.GameSpeedInverse);
 
 			material.SetColor("_TintColor", Color.black);
-			var lightOn = LeanTween.value(gameObject, Color.black, onColor, 0.3f);
+			var lightOn = LeanTween.value(gameObject, Color.black, onColor, 0.3f * GameManager.Instance.GameSpeedInverse);
 			lightOn.setOnUpdateColor((Color val) =>
 			{
 				material.SetColor("_TintColor", val);
+			});
+			beamMaterial.SetColor("_TintColor", Color.black);
+			var beamLightOn = LeanTween.value(gameObject, Color.black, beamOnColor, 0.3f * GameManager.Instance.GameSpeedInverse);
+			beamLightOn.setOnUpdateColor((Color val) =>
+			{
+				beamMaterial.SetColor("_TintColor", val);
 			});
 			lightOn.onComplete = () =>
 			{
@@ -112,10 +122,15 @@ namespace SpaceTyckiting
 
 		void AnimateLightOff()
 		{
-			var lightOff = LeanTween.value(gameObject, onColor, Color.black, 0.4f);
+			var lightOff = LeanTween.value(gameObject, onColor, Color.black, 0.5f * GameManager.Instance.GameSpeedInverse);
 			lightOff.setOnUpdateColor((Color val) =>
 			{
 				material.SetColor("_TintColor", val);
+			});
+			var beamLightOff = LeanTween.value(gameObject, beamOnColor, Color.black, 0.5f * GameManager.Instance.GameSpeedInverse);
+			beamLightOff.setOnUpdateColor((Color val) =>
+			{
+				beamMaterial.SetColor("_TintColor", val);
 			});
 			lightOff.onComplete = () =>
 			{
@@ -123,8 +138,8 @@ namespace SpaceTyckiting
 				
 			};
 			lightOff.setEase(LeanTweenType.easeInOutBounce);
-			var delay = 0.5f + Random.value * 0.5f;
-			lightOff.delay = delay;			
+			var delay = 0.75f + Random.value * 0.5f;
+			lightOff.delay = delay * GameManager.Instance.GameSpeedInverse;			
 		}
 
 		void LightOffCompletion()
@@ -140,6 +155,9 @@ namespace SpaceTyckiting
 		{
 			if (meshObject != null) Destroy(meshObject);
 			if (meshObject != null) Destroy(targetObject);
+
+			beamMaterial.SetColor("_TintColor", beamOnColor);
+			material.SetColor ("_TintColor", onColor);
 		}
 	}
 }

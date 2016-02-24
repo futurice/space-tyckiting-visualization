@@ -97,7 +97,7 @@ namespace SpaceTyckiting
 
 		public void SetTimeScale(float timeScale)
 		{
-			Time.timeScale = timeScale;
+			GameManager.Instance.GameSpeed = timeScale;
 		}
 
 		void HandleGameLoaded(GameplayData data)
