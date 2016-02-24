@@ -251,8 +251,8 @@ namespace SpaceTyckiting
 				{
 					HandleMoves(turns[CurrentTurn].moves);
 
-					timeUsed += 0.3f;
-					yield return new WaitForSeconds(0.3f);
+					timeUsed += 0.3f * GameSpeedInverse;
+					yield return new WaitForSeconds(0.3f * GameSpeedInverse);
 				}
 
 				var spottedByRange = new List<UnitController>();
@@ -267,13 +267,13 @@ namespace SpaceTyckiting
 					HandleRadars(turns[CurrentTurn].radars);
 					HandleSpots(turns[CurrentTurn].radarEchos, spottedByRadar);
 
-					timeUsed += 1f;
-					yield return new WaitForSeconds(0.5f);
+					timeUsed += GameSpeedInverse;
+					yield return new WaitForSeconds(0.5f * GameSpeedInverse);
 
 					RevealSpotted(spottedByRadar, spottedLastTurn);
 					spotted.AddRange(spotted);
 
-					yield return new WaitForSeconds(0.5f);
+					yield return new WaitForSeconds(0.5f * GameSpeedInverse);
 				}
 
 				CurrentPhase = GamePhase.Cannons;
@@ -282,14 +282,14 @@ namespace SpaceTyckiting
 
 					HandleCannons(turns[CurrentTurn].cannons);
 
-					timeUsed += 1.85f;
-					yield return new WaitForSeconds(1.5f);
+					timeUsed += 1.85f * GameSpeedInverse;
+					yield return new WaitForSeconds(1.5f * GameSpeedInverse);
 
 					HandleDamages(turns[CurrentTurn].damages);
 					HandleDeaths(turns[CurrentTurn].deaths);
 
-					timeUsed += 0.35f;
-					yield return new WaitForSeconds(0.35f);
+					timeUsed += 0.35f * GameSpeedInverse;
+					yield return new WaitForSeconds(0.35f * GameSpeedInverse);
 				}
 				else
 				{
