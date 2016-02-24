@@ -30,8 +30,9 @@ namespace SpaceTyckiting
 			}
 			set
 			{
-				gameSpeed = Mathf.Clamp (value, 0.2f, 5f);
+				gameSpeed = Mathf.Clamp (value, 0.5f, 10f);
 				GameSpeedInverse = 1 / gameSpeed;
+				gameSpeedLabel.text = "Speed x" + gameSpeed.ToString ("0.#");
 			}
 		}
 
@@ -52,6 +53,11 @@ namespace SpaceTyckiting
 		[SerializeField]
 		private Transform gameParent;
 		public Transform GameParent { get { return gameParent; } }
+
+		[SerializeField]
+		private UnityEngine.UI.Slider gameSpeedSlider;
+		[SerializeField]
+		private UnityEngine.UI.Text gameSpeedLabel;
 
 		public List<UnitController> Units {get; private set; }
 
@@ -81,7 +87,7 @@ namespace SpaceTyckiting
 		{
 			Instance = this;
 
-			GameSpeed = 3;
+			SetGameSpeed (1);
 		
 			LeanTween.init(200);
 		}
@@ -409,6 +415,12 @@ namespace SpaceTyckiting
 		public void Quit()
 		{
 			Application.Quit();
+		}
+
+		public void SetGameSpeed(float value)
+		{
+			GameSpeed = value;
+			gameSpeedSlider.value = value;
 		}
 	}
 }

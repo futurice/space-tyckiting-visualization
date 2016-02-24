@@ -42,14 +42,17 @@ namespace SpaceTyckiting
 
 		private float lastTouchTime = 0;
 
-		private bool isAutoRotating = false;
+		private bool isAutoRotating = true;
 
 		// Update is called once per frame
 		void Update()
 		{
 			if (!targetCamera.enabled) return;
 
-			if (Input.anyKey || Input.GetMouseButton(1))
+			if (Input.GetMouseButton(1) 
+				|| Input.GetAxis("Horizontal") != 0
+				|| Input.GetAxis("Vertical") != 0
+				|| Input.mouseScrollDelta.sqrMagnitude > 0)
 			{
 				isAutoRotating = false;
 				lastTouchTime = Time.time;
