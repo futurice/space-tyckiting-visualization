@@ -53,7 +53,9 @@ namespace SpaceTyckiting
 			musicToggle.isOn = PlayerPrefs.GetInt("music_on", 1) > 0;
 			soundsToggle.isOn = PlayerPrefs.GetInt("sounds_on", 1) > 0;
 
+			#if !UNITY_WEBGL
 			Application.targetFrameRate = quality >= 2 ? 60 : 30;
+			#endif
 
 			musicPlayer.enabled = musicToggle.isOn;
 
@@ -80,7 +82,10 @@ namespace SpaceTyckiting
 			if (initialized)
 			{
 				QualitySettings.SetQualityLevel(level);
+
+				#if !UNITY_WEBGL
 				Application.targetFrameRate = level >= 2 ? 60 : 30;
+				#endif
 
 				PlayerPrefs.SetInt("quality_level", level);
 
