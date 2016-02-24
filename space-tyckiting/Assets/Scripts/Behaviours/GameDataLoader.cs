@@ -41,7 +41,14 @@ namespace SpaceTyckiting
 			}
 			else if (Application.isWebPlayer || Application.platform == RuntimePlatform.WebGLPlayer) 
 			{
-				Application.ExternalCall ("OnUnityReady");
+				try
+				{
+					Application.ExternalCall ("OnUnityReady");
+				}
+				catch (System.Exception ex) 
+				{
+					Debug.LogWarning ("OnUnityReady error: " + ex.Message);
+				}
 			}
 			else 
 			{
