@@ -53,13 +53,6 @@ namespace SpaceTyckiting
 			line = GetComponent<LineRenderer>();
 			tr = GetComponent<Transform>();
 			col = GetComponent<Collider>();
-			col.enabled = false;
-			Invoke("EnableCollider", 1);
-		}
-
-		void EnableCollider()
-		{
-			col.enabled = true;
 		}
 
 		void Update()
