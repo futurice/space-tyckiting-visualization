@@ -39,7 +39,8 @@ namespace SpaceTyckiting
 				switch (message["type"]) {
 				case "connected":
 					// TODO: Read config
-					var configData = message["config"];
+					var configData = message ["config"];
+
 					config = new ConfigData(configData["bots"].AsInt, configData["fieldRadius"].AsInt, configData["move"].AsInt, configData["startHp"].AsInt,
 					                        configData["cannon"].AsInt, configData["radar"].AsInt, configData["see"].AsInt, configData["maxCount"].AsInt,
 					                        configData["loopTime"].AsInt);
@@ -67,8 +68,18 @@ namespace SpaceTyckiting
 					// Read asteroids when first available
 					if (asteroids.Count <= 0) {
 						foreach (var asteroidData in message["asteroids"].Children) {
-							asteroids.Add(new AsteroidData(asteroidData["x"].AsInt, asteroidData["y"].AsInt));
+							asteroids.Add (new AsteroidData (asteroidData ["x"].AsInt, asteroidData ["y"].AsInt));
 						}
+					}
+
+					// This really shouldn't be in every round, but we'll check any way
+					if (message ["config"] != null) 
+					{
+						var inlineConfigData = message ["config"];
+
+						config = new ConfigData(inlineConfigData["bots"].AsInt, inlineConfigData["fieldRadius"].AsInt, inlineConfigData["move"].AsInt, inlineConfigData["startHp"].AsInt,
+							inlineConfigData["cannon"].AsInt, inlineConfigData["radar"].AsInt, inlineConfigData["see"].AsInt, inlineConfigData["maxCount"].AsInt,
+							inlineConfigData["loopTime"].AsInt);
 					}
 
 					// Read actions and events
